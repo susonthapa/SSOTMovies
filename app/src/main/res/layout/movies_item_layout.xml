@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <com.facebook.drawee.view.SimpleDraweeView
+        android:id="@+id/movie_image"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginTop="16dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginBottom="16dp"
+        android:layout_width="100dp"
+        android:layout_height="100dp"/>
+
+    <TextView
+        app:layout_constraintStart_toEndOf="@id/movie_image"
+        app:layout_constraintTop_toTopOf="@id/movie_image"
+        app:layout_constraintEnd_toStartOf="@id/movie_remove"
+        app:layout_constraintHorizontal_bias="0"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:id="@+id/movie_title"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Title"
+        android:textSize="25sp"
+        android:textStyle="bold"
+        android:textColor="#000000"/>
+
+    <TextView
+        android:id="@+id/movie_type"
+        app:layout_constraintStart_toStartOf="@id/movie_title"
+        app:layout_constraintTop_toBottomOf="@id/movie_title"
+        app:layout_constraintEnd_toEndOf="@id/movie_title"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Type"
+        android:textSize="18sp"/>
+
+    <TextView
+        android:id="@+id/movie_year"
+        app:layout_constraintEnd_toEndOf="@id/movie_title"
+        app:layout_constraintTop_toBottomOf="@id/movie_type"
+        app:layout_constraintStart_toStartOf="@id/movie_type"
+        app:layout_constraintHorizontal_bias="1"
+        app:layout_constraintBottom_toBottomOf="@id/movie_image"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="16sp"
+        android:text="Year"/>
+
+    <ImageButton
+        android:id="@+id/movie_remove"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:scaleType="fitCenter"
+        android:src="@drawable/ic_delete"
+        android:background="@null"
+        android:layout_width="32dp"
+        android:layout_height="32dp"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

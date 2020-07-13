@@ -1,5 +1,6 @@
 package np.com.susonthapa.ssotmovies.repository
 
+import io.reactivex.Completable
 import io.reactivex.Observable
 import np.com.susonthapa.ssotmovies.network.ApiService
 import np.com.susonthapa.ssotmovies.network.SearchResponse
@@ -15,6 +16,10 @@ class MoviesRepository @Inject constructor(
     private val moviesDao: MoviesDao,
     private val api: ApiService
 ) {
+
+    fun removeMovie(movie: Movies): Completable {
+        return moviesDao.removeMovie(movie)
+    }
 
     fun getMovies(): Observable<Lce<List<Movies>>> {
         return Observable.merge(getMoviesFromDB(), getMoviesFromServer())
