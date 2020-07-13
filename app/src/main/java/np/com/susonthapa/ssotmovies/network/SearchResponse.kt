@@ -10,7 +10,7 @@ import com.squareup.moshi.JsonClass
 @JsonClass(generateAdapter = true)
 data class SearchResponse(
     @Json(name = "Response")
-    val response: Boolean,
+    val response: String,
     @Json(name = "Search")
     val search: List<Search>,
     @Json(name = "Error")
@@ -21,7 +21,7 @@ data class SearchResponse(
     data class Search(
         @Json(name = "imdbID")
         val id: String,
-        @Json(name = "title")
+        @Json(name = "Title")
         val title: String,
         @Json(name = "Year")
         val year: String,

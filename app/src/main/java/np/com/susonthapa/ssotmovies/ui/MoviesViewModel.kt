@@ -7,6 +7,7 @@ import io.reactivex.schedulers.Schedulers
 import np.com.susonthapa.ssotmovies.persistance.Movies
 import np.com.susonthapa.ssotmovies.repository.Lce
 import np.com.susonthapa.ssotmovies.repository.MoviesRepository
+import timber.log.Timber
 import javax.inject.Inject
 
 /**

@@ -46,7 +46,7 @@ class MoviesRepository @Inject constructor(
     private fun getMoviesFromServer(): Observable<Lce<List<Movies>>> {
         return api.getMovies()
             .map<Lce<List<Movies>>> {
-                if (it.response) {
+                if (it.response == "True") {
                     val movies = convertSearchResponse(it.search)
                     moviesDao.insertAll(movies)
                     Lce.Content(movies)
