@@ -45,8 +45,11 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        fetchMovies()
+        binding.swipeToRefresh.setOnRefreshListener {
+            fetchMovies()
+        }
 
+        fetchMovies()
     }
 
     private fun fetchMovies() {
@@ -54,11 +57,15 @@ class MainActivity : AppCompatActivity() {
         disposable?.dispose()
         disposable = viewModel.getAllMovies()
             .subscribe({
+                Timber.d("movies: $it")
                 when (it) {
                     is Lce.Loading -> {
-                        // only show loading if the list is empty
                         if (adapter.itemCount == 0) {
+                            Timber.d("showing full screen loader")
                             binding.moviesRecycler.showLoadingView()
+                        } else {
+                            Timber.d("showing swipe refresh loader")
+                            binding.swipeToRefresh.isRefreshing = true
                         }
                     }
 
@@ -70,6 +77,8 @@ class MainActivity : AppCompatActivity() {
                             binding.moviesRecycler.hideAllViews()
                         }
                         adapter.submitList(it.packet)
+                        Timber.d("stopping swipe refresh")
+                        binding.swipeToRefresh.isRefreshing = false
                     }
 
                     is Lce.Error -> {
@@ -77,12 +86,18 @@ class MainActivity : AppCompatActivity() {
                         if (adapter.itemCount == 0) {
                             binding.moviesRecycler.showErrorView(it.throwable?.message)
                         }
+                        binding.swipeToRefresh.isRefreshing = false
                     }
                 }
             }, {
                 it.printStackTrace()
                 Timber.w("movies stream error")
             })
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        disposable?.dispose()
     }
 
 }

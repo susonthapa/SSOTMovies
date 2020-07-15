@@ -6,6 +6,7 @@ import np.com.susonthapa.ssotmovies.network.ApiService
 import np.com.susonthapa.ssotmovies.network.SearchResponse
 import np.com.susonthapa.ssotmovies.persistance.Movies
 import np.com.susonthapa.ssotmovies.persistance.MoviesDao
+import timber.log.Timber
 import javax.inject.Inject
 
 /**
@@ -22,7 +23,8 @@ class MoviesRepository @Inject constructor(
     }
 
     fun getMovies(): Observable<Lce<List<Movies>>> {
-        return Observable.merge(getMoviesFromDB(), getMoviesFromServer())
+//        return Observable.merge(getMoviesFromDB(), getMoviesFromServer())
+        return getMoviesFromDB()
     }
 
     /**
@@ -31,16 +33,30 @@ class MoviesRepository @Inject constructor(
      * from db, we want it to display the emptyView if the data is empty.
      */
     private fun getMoviesFromDB(): Observable<Lce<List<Movies>>> {
-        return Observable.concat(
-            moviesDao.getAllMovies()
-                .take(1)
-                .filter {
-                    it.isNotEmpty()
-                }
-                .map { Lce.Content(it) },
-            moviesDao.getAllMovies()
-                .skip(1)
-                .map { Lce.Content(it) })
+        return moviesDao
+            .getAllMovies()
+            .publish { o ->
+                Observable.concatEager(
+                    arrayListOf(
+                        o.take(1)
+                            .flatMap {
+                                if (it.isEmpty()) {
+                                    Timber.d("DB is empty, requesting network")
+                                    getMoviesFromServer()
+                                } else {
+                                    Timber.d("Data in DB, emitting DB data then requesting network")
+                                    // we want to first emit the DB content and then request the network
+                                    Observable.concat(
+                                        Observable.just(Lce.Content(it)),
+                                        getMoviesFromServer()
+                                    )
+                                }
+                            },
+
+                        o.skip(1)
+                            .map { Lce.Content(it) })
+                    )
+            }
     }
 
     private fun getMoviesFromServer(): Observable<Lce<List<Movies>>> {
@@ -48,6 +64,7 @@ class MoviesRepository @Inject constructor(
             .map<Lce<List<Movies>>> {
                 if (it.response == "True") {
                     val movies = convertSearchResponse(it.search)
+                    Timber.d("saving to DB: ${it.search.size}")
                     moviesDao.insertAll(movies)
                     Lce.Content(movies)
                 } else {

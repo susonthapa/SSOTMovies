@@ -13,17 +13,17 @@ import io.reactivex.Observable
  */
 
 @Dao
-interface MoviesDao {
+abstract class MoviesDao {
 
     @Query("SELECT * FROM movies")
-    fun getAllMovies(): Observable<List<Movies>>
+    abstract fun getAllMovies(): Observable<List<Movies>>
 
 
     @Delete
-    fun removeMovie(movie: Movies): Completable
+    abstract fun removeMovie(movie: Movies): Completable
 
     @Insert(onConflict = REPLACE)
-    fun insertAll(movies: List<Movies>)
+    abstract fun insertAll(movies: List<Movies>)
 
 }
 
