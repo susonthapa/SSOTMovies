@@ -60,7 +60,7 @@ class MainActivity : AppCompatActivity() {
                 Timber.d("movies: $it")
                 when (it) {
                     is Lce.Loading -> {
-                        if (adapter.itemCount == 0) {
+                        if (adapter.itemCount == 0 && !binding.swipeToRefresh.isRefreshing) {
                             Timber.d("showing full screen loader")
                             binding.moviesRecycler.showLoadingView()
                         } else {
