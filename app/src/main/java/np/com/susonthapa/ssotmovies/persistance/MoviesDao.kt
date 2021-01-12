@@ -5,8 +5,7 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy.REPLACE
 import androidx.room.Query
-import io.reactivex.Completable
-import io.reactivex.Observable
+import kotlinx.coroutines.flow.Flow
 
 /**
  * Created by suson on 7/13/20
@@ -16,14 +15,13 @@ import io.reactivex.Observable
 abstract class MoviesDao {
 
     @Query("SELECT * FROM movies")
-    abstract fun getAllMovies(): Observable<List<Movies>>
-
+    abstract fun getAllMovies(): Flow<List<Movies>>
 
     @Delete
-    abstract fun removeMovie(movie: Movies): Completable
+    abstract suspend fun removeMovie(movie: Movies)
 
     @Insert(onConflict = REPLACE)
-    abstract fun insertAll(movies: List<Movies>)
+    abstract suspend fun insertAll(movies: List<Movies>)
 
 }
 

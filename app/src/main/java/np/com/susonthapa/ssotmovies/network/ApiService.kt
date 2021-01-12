@@ -1,6 +1,5 @@
 package np.com.susonthapa.ssotmovies.network
 
-import io.reactivex.Observable
 import np.com.susonthapa.ssotmovies.BuildConfig
 import retrofit2.http.GET
 import retrofit2.http.Query
@@ -11,9 +10,9 @@ import retrofit2.http.Query
 interface ApiService {
 
     @GET("/")
-    fun getMovies(
+    suspend fun getMovies(
         @Query("s") name: String = "blade",
         @Query("apiKey") apiKey: String = BuildConfig.OMDB_API_KEY
-    ): Observable<SearchResponse>
+    ): SearchResponse
 
 }

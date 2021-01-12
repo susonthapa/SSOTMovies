@@ -1,16 +1,12 @@
 package np.com.susonthapa.ssotmovies.ui
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
-import io.reactivex.disposables.Disposable
+import kotlinx.coroutines.FlowPreview
 import np.com.susonthapa.ssotmovies.BaseApplication
-import np.com.susonthapa.ssotmovies.R
 import np.com.susonthapa.ssotmovies.databinding.ActivityMainBinding
 import np.com.susonthapa.ssotmovies.di.ViewModelFactory
-import np.com.susonthapa.ssotmovies.persistance.Movies
-import np.com.susonthapa.ssotmovies.repository.Lce
-import timber.log.Timber
 import javax.inject.Inject
 
 class MainActivity : AppCompatActivity() {
@@ -24,8 +20,7 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var adapter: MoviesAdapter
 
-    private var disposable: Disposable? = null
-
+    @FlowPreview
     override fun onCreate(savedInstanceState: Bundle?) {
         (application as BaseApplication).appComponent.inject(this)
         super.onCreate(savedInstanceState)
@@ -48,56 +43,33 @@ class MainActivity : AppCompatActivity() {
         binding.swipeToRefresh.setOnRefreshListener {
             fetchMovies()
         }
-
+        setupObservers()
         fetchMovies()
     }
 
-    private fun fetchMovies() {
-        // remove any previous subscription
-        disposable?.dispose()
-        disposable = viewModel.getAllMovies()
-            .subscribe({
-                Timber.d("movies: $it")
-                when (it) {
-                    is Lce.Loading -> {
-                        if (adapter.itemCount == 0 && !binding.swipeToRefresh.isRefreshing) {
-                            Timber.d("showing full screen loader")
-                            binding.moviesRecycler.showLoadingView()
-                        } else {
-                            Timber.d("showing swipe refresh loader")
-                            binding.swipeToRefresh.isRefreshing = true
-                        }
-                    }
+    private fun setupObservers() {
+        viewModel.movies.observe(this) {
+            if (it.isEmpty()) {
+                binding.moviesRecycler.showEmptyView()
+            } else {
+                binding.moviesRecycler.hideAllViews()
+            }
+            adapter.submitList(it)
+            binding.swipeToRefresh.isRefreshing = false
+        }
 
-                    is Lce.Content -> {
-                        // check for empty list, it's better to check in view model
-                        if (it.packet.isEmpty()) {
-                            binding.moviesRecycler.showEmptyView()
-                        } else {
-                            binding.moviesRecycler.hideAllViews()
-                        }
-                        adapter.submitList(it.packet)
-                        Timber.d("stopping swipe refresh")
-                        binding.swipeToRefresh.isRefreshing = false
-                    }
-
-                    is Lce.Error -> {
-                        // only show error if the list is empty
-                        if (adapter.itemCount == 0) {
-                            binding.moviesRecycler.showErrorView(it.throwable?.message)
-                        }
-                        binding.swipeToRefresh.isRefreshing = false
-                    }
-                }
-            }, {
-                it.printStackTrace()
-                Timber.w("movies stream error")
-            })
+        viewModel.isLoading.observe(this) {
+            if (adapter.itemCount == 0 && !binding.swipeToRefresh.isRefreshing) {
+                binding.moviesRecycler.showLoadingView()
+            } else {
+                binding.swipeToRefresh.isRefreshing = it
+            }
+        }
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        disposable?.dispose()
+    @FlowPreview
+    private fun fetchMovies() {
+        viewModel.getAllMovies()
     }
 
 }
